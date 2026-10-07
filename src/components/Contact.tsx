@@ -1,10 +1,14 @@
-import { useState, type FormEvent } from 'react'
-import { useContent } from '../i18n'
+import { useRef, useState, type FormEvent } from 'react'
+import { useLang } from '../i18n'
 import { Icon, Label, Mark, Reveal } from './ui'
 
 export default function Contact() {
-  const { profile, ui } = useContent()
+  const { c, lang } = useLang()
+  const { profile, ui } = c
   const t = ui.contact
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error' | 'invalid' | 'limited'>('idle')
+  const startedAt = useRef(Date.now())
+  const honeypot = useRef<HTMLInputElement>(null)
   const [copied, setCopied] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', message: '' })
 
@@ -23,12 +27,36 @@ export default function Contact() {
     window.setTimeout(() => setCopied(false), 2000)
   }
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault()
-    const subject = encodeURIComponent(`${t.subject} : ${form.name || t.newMessage}`)
-    const body = encodeURIComponent(`${form.message}\n\n${form.name}\n${form.email}`)
-    window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`
+    if (status === 'sending') return
+    setStatus('sending')
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          lang,
+          startedAt: startedAt.current,
+          website: honeypot.current?.value || '',
+        }),
+      })
+      if (res.ok) {
+        setStatus('sent')
+        setForm({ name: '', email: '', message: '' })
+        return
+      }
+      const data = await res.json().catch(() => ({}))
+      setStatus(data.error === 'invalid_email' ? 'invalid' : res.status === 429 ? 'limited' : 'error')
+    } catch {
+      setStatus('error')
+    }
   }
+
+  const mailtoHref = `mailto:${profile.email}?subject=${encodeURIComponent(
+    `${t.subject} : ${form.name || t.newMessage}`,
+  )}&body=${encodeURIComponent(`${form.message}\n\n${form.name}\n${form.email}`)}`
 
   const field =
     'w-full rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4 text-[17px] text-white placeholder:text-white/30 outline-none transition-colors focus:border-build-light focus:bg-white/[0.06]'
@@ -119,49 +147,99 @@ export default function Contact() {
 
         {/* Formulaire */}
         <Reveal delay={0.1} className="mx-auto mt-20 max-w-2xl text-left">
-          <form onSubmit={submit} className="tile-dark border border-white/[0.06] p-6 md:p-10">
-            <p className="font-display text-2xl font-semibold tracking-tight text-white">{t.formTitle}</p>
-            <p className="mt-1 text-[15px] text-mute">{t.formText}</p>
-            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <label className="block">
-                <span className="sr-only">{t.name}</span>
-                <input
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder={t.name}
-                  autoComplete="name"
-                  className={field}
-                />
-              </label>
-              <label className="block">
-                <span className="sr-only">Email</span>
-                <input
-                  required
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder={t.email}
-                  autoComplete="email"
-                  className={field}
-                />
-              </label>
+          {status === 'sent' ? (
+            <div className="tile-dark border border-white/[0.06] p-6 text-center md:p-10" role="status">
+              <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#30d158]/15 text-[#5fe08a]">
+                <Icon name="check" size={26} strokeWidth={2.2} />
+              </span>
+              <p className="mt-5 font-display text-2xl font-semibold tracking-tight text-white">{t.sentTitle}</p>
+              <p className="mt-2 text-[15px] text-mute">{t.sentText}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  startedAt.current = Date.now()
+                  setStatus('idle')
+                }}
+                className="link-brand mt-6 !text-build-light"
+              >
+                {t.sendAnother} <Icon name="chevronRight" size={15} />
+              </button>
             </div>
-            <label className="mt-3 block">
-              <span className="sr-only">Message</span>
-              <textarea
-                required
-                rows={5}
-                value={form.message}
-                onChange={(e) => setForm({ ...form, message: e.target.value })}
-                placeholder={t.message}
-                className={`${field} resize-none`}
-              />
-            </label>
-            <button type="submit" className="btn-primary mt-6 w-full justify-center sm:w-auto">
-              {t.send} <Icon name="send" size={16} />
-            </button>
-          </form>
+          ) : (
+            <form onSubmit={submit} className="tile-dark border border-white/[0.06] p-6 md:p-10" noValidate={false}>
+              <p className="font-display text-2xl font-semibold tracking-tight text-white">{t.formTitle}</p>
+              <p className="mt-1 text-[15px] text-mute">{t.formText}</p>
+              {/* Champ piège invisible pour les robots */}
+              <div aria-hidden="true" className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden">
+                <label>
+                  Website
+                  <input ref={honeypot} type="text" name="website" tabIndex={-1} autoComplete="off" />
+                </label>
+              </div>
+              <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <label className="block">
+                  <span className="sr-only">{t.name}</span>
+                  <input
+                    required
+                    maxLength={100}
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder={t.name}
+                    autoComplete="name"
+                    className={field}
+                  />
+                </label>
+                <label className="block">
+                  <span className="sr-only">{t.email}</span>
+                  <input
+                    required
+                    type="email"
+                    maxLength={200}
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder={t.email}
+                    autoComplete="email"
+                    className={field}
+                  />
+                </label>
+              </div>
+              <label className="mt-3 block">
+                <span className="sr-only">Message</span>
+                <textarea
+                  required
+                  rows={5}
+                  maxLength={5000}
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  placeholder={t.message}
+                  className={`${field} resize-none`}
+                />
+              </label>
+              {(status === 'error' || status === 'invalid' || status === 'limited') && (
+                <p className="mt-4 rounded-xl bg-break/10 px-4 py-3 text-[14px] leading-relaxed text-[#ff9aa8]" role="alert">
+                  {status === 'invalid' ? (
+                    t.invalidEmail
+                  ) : (
+                    <>
+                      {status === 'limited' ? t.rateLimited : t.errorText}{' '}
+                      <a href={mailtoHref} className="underline underline-offset-2 hover:text-white">
+                        {profile.email}
+                      </a>
+                      .
+                    </>
+                  )}
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={status === 'sending'}
+                className="btn-primary mt-6 w-full justify-center disabled:cursor-wait disabled:opacity-70 sm:w-auto"
+              >
+                {status === 'sending' ? t.sending : t.send}{' '}
+                <Icon name="send" size={16} className={status === 'sending' ? 'animate-pulse' : ''} />
+              </button>
+            </form>
+          )}
         </Reveal>
       </div>
     </section>
