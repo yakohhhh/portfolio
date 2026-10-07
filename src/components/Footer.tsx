@@ -1,7 +1,10 @@
-import { brand, navLinks, profile } from '../data'
+import { useContent } from '../i18n'
+import LangSwitch from './LangSwitch'
 import { Icon, Mark, Reveal } from './ui'
 
 export default function Footer() {
+  const { brand, navLinks, profile, ui } = useContent()
+  const t = ui.footer
   const [build, brk, secure] = brand.signature
   return (
     <footer data-nav="dark" className="relative overflow-hidden bg-black pb-10 text-[13px] text-mute">
@@ -23,7 +26,7 @@ export default function Footer() {
             <Mark size={28} />
             <span className="font-display text-[15px] font-semibold tracking-[-0.03em]">{profile.name}</span>
           </div>
-          <nav className="flex flex-wrap gap-x-6 gap-y-2" aria-label="Liens de pied de page">
+          <nav className="flex flex-wrap gap-x-6 gap-y-2" aria-label={t.linksAria}>
             {navLinks.map((l) => (
               <a key={l.id} href={`#${l.id}`} className="transition-colors hover:text-white">
                 {l.label}
@@ -31,6 +34,7 @@ export default function Footer() {
             ))}
           </nav>
           <div className="flex items-center gap-4">
+            <LangSwitch />
             <a href={profile.socials.github} target="_blank" rel="noreferrer" aria-label="GitHub" className="hover:text-white">
               <Icon name="github" size={17} />
             </a>
@@ -42,7 +46,7 @@ export default function Footer() {
             </a>
             <a
               href="#accueil"
-              aria-label="Revenir en haut"
+              aria-label={t.top}
               className="ml-2 grid h-9 w-9 place-items-center rounded-full border border-line-dark transition-colors hover:border-white/40 hover:text-white"
             >
               <Icon name="arrowUp" size={15} />
@@ -50,7 +54,7 @@ export default function Footer() {
           </div>
         </div>
         <p className="label mt-8 !text-[11px] text-white/30">
-          © {new Date().getFullYear()} {profile.name} · Conçu et développé à Strasbourg
+          © {new Date().getFullYear()} {profile.name} · {t.madeIn}
         </p>
       </div>
     </footer>

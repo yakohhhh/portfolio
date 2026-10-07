@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { brand, introLines, profile } from '../data'
+import { useContent } from '../i18n'
 import { Mark } from './ui'
 
 const STEP = 880 // durée d'une phrase (ms)
@@ -23,6 +23,7 @@ export function shouldPlayIntro() {
  * puis le monogramme AM s'assemble et le rideau se lève sur le hero.
  */
 export default function Intro({ onDone }: { onDone: () => void }) {
+  const { introLines, brand, profile, ui } = useContent()
   const [step, setStep] = useState(0) // 0..n-1 = phrases, n = logo
   const [leaving, setLeaving] = useState(false)
   const done = useRef(false)
@@ -119,7 +120,7 @@ export default function Intro({ onDone }: { onDone: () => void }) {
         onClick={finish}
         className="label absolute bottom-7 right-6 rounded-full px-4 py-2 text-white/45 transition-colors hover:bg-white/10 hover:text-white md:right-10"
       >
-        Passer
+        {ui.intro.skip}
       </button>
     </div>
   )

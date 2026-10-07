@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { navLinks, profile } from '../data'
+import { useContent } from '../i18n'
+import LangSwitch from './LangSwitch'
 import { Icon, Mark } from './ui'
 
 /**
@@ -8,6 +9,8 @@ import { Icon, Mark } from './ui'
  * qui se trouve dessous (attribut data-nav des sections).
  */
 export default function Navbar({ visible }: { visible: boolean }) {
+  const { navLinks, profile, ui } = useContent()
+  const t = ui.nav
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [active, setActive] = useState('')
   const [open, setOpen] = useState(false)
@@ -87,7 +90,7 @@ export default function Navbar({ visible }: { visible: boolean }) {
             className={`flex items-center gap-2.5 font-display text-[16px] font-semibold tracking-[-0.03em] transition-colors ${
               dark ? 'text-white' : 'text-ink'
             }`}
-            aria-label="Retour en haut de page"
+            aria-label={t.home}
           >
             <Mark size={24} />
             {profile.name}
@@ -114,18 +117,19 @@ export default function Navbar({ visible }: { visible: boolean }) {
             ))}
           </ul>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <LangSwitch dark={dark} />
             <a
               href={profile.cv}
               download
               className="hidden rounded-full bg-build-ink px-3.5 py-1 text-[13px] text-white transition-colors hover:bg-build-hover sm:inline-flex"
             >
-              Télécharger le CV
+              {t.cv}
             </a>
             <button
               onClick={() => setOpen((o) => !o)}
               className={`-mr-2 grid h-10 w-10 place-items-center lg:hidden ${dark ? 'text-white' : 'text-ink'}`}
-              aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+              aria-label={open ? t.closeMenu : t.openMenu}
               aria-expanded={open}
             >
               <span className="relative block h-3 w-4">
@@ -179,7 +183,7 @@ export default function Navbar({ visible }: { visible: boolean }) {
             style={{ transitionDelay: open ? '400ms' : '0ms', opacity: open ? 1 : 0 }}
           >
             <a href={profile.cv} download className="btn-primary">
-              <Icon name="download" size={16} /> Télécharger le CV
+              <Icon name="download" size={16} /> {t.cv}
             </a>
           </li>
         </ul>

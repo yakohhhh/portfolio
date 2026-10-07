@@ -1,7 +1,8 @@
-import { interests, languages, profile, stats } from '../data'
+import { useContent } from '../i18n'
 import { Break, Counter, Icon, Reveal, SectionHeading, useInView } from './ui'
 
 function Languages() {
+  const { languages } = useContent()
   const [ref, inView] = useInView<HTMLDivElement>(0.3)
   return (
     <div ref={ref} className={`mt-6 space-y-5 ${inView ? 'is-in' : ''}`}>
@@ -29,15 +30,18 @@ function Languages() {
 }
 
 export default function About() {
+  const { profile, stats, interests, ui } = useContent()
+  const t = ui.about
   return (
     <section id="a-propos" data-nav="light" className="bg-silver py-28 md:py-40">
       <div className="container-wide">
         <SectionHeading
-          eyebrow="À propos"
+          eyebrow={t.eyebrow}
           index="01"
           title={
             <>
-              Un développeur qui pense comme un <Break>attaquant.</Break>
+              {t.title[0]}
+              <Break>{t.title[1]}</Break>
             </>
           }
         />
@@ -49,7 +53,7 @@ export default function About() {
               <source type="image/webp" srcSet={profile.photos.portrait} />
               <img
                 src={profile.photos.portraitFallback}
-                alt="Portrait d'Ayman Mazroui"
+                alt={t.portraitAlt}
                 loading="lazy"
                 className="absolute inset-0 h-full w-full object-cover"
                 style={{ objectPosition: '50% 22%' }}
@@ -62,7 +66,7 @@ export default function About() {
                   <Icon name="mapPin" size={15} /> {profile.location}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Icon name="graduation" size={15} /> EPITECH, 4ᵉ année
+                  <Icon name="graduation" size={15} /> {t.schoolYear}
                 </span>
               </div>
             </div>
@@ -97,13 +101,13 @@ export default function About() {
 
           {/* Langues */}
           <Reveal className="tile p-8 md:col-span-3 lg:col-span-5">
-            <p className="eyebrow text-ink">Langues</p>
+            <p className="eyebrow text-ink">{t.languages}</p>
             <Languages />
           </Reveal>
 
           {/* Centres d'intérêt */}
           <Reveal delay={0.08} className="tile p-8 md:col-span-3 lg:col-span-4">
-            <p className="eyebrow text-ink">Centres d’intérêt</p>
+            <p className="eyebrow text-ink">{t.interests}</p>
             <div className="mt-6 flex flex-wrap gap-2">
               {interests.map((it) => (
                 <span key={it} className="chip bg-silver text-ink">
@@ -125,11 +129,11 @@ export default function About() {
             </span>
             <div className="relative mt-8">
               <p className="font-display text-2xl font-semibold leading-tight tracking-tight text-white">
-                Disponible.
+                {t.available}
               </p>
-              <p className="mt-2 text-[15px] leading-snug text-mute">Alternance & stage, dès maintenant.</p>
+              <p className="mt-2 text-[15px] leading-snug text-mute">{t.availableText}</p>
               <a href="#contact" className="link-brand mt-4 !text-build-light">
-                Discutons-en <Icon name="chevronRight" size={15} />
+                {t.availableCta} <Icon name="chevronRight" size={15} />
               </a>
             </div>
           </Reveal>

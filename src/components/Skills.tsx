@@ -1,4 +1,5 @@
-import { cyberStack, devStack, softSkills } from '../data'
+import { cyberStack, devStack } from '../data'
+import { useContent } from '../i18n'
 import { Icon, Reveal, SectionHeading } from './ui'
 
 function DisciplineCard({
@@ -52,39 +53,41 @@ function DisciplineCard({
 }
 
 export default function Skills() {
+  const { softSkills, ui } = useContent()
+  const t = ui.skills
   return (
     <section id="competences" data-nav="light" className="bg-white py-28 md:py-40">
       <div className="container-wide">
         <SectionHeading
-          eyebrow="Compétences"
+          eyebrow={t.eyebrow}
           index="03"
           title={
             <>
-              Deux disciplines.
+              {t.title[0]}
               <br />
-              <span className="text-mute">Un même niveau d’exigence.</span>
+              <span className="text-mute">{t.title[1]}</span>
             </>
           }
         />
 
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <DisciplineCard
-            word="Construire."
+            word={t.buildWord}
             gradientClass="text-gradient-build"
             glow="radial-gradient(circle, #2f7bff, transparent 70%)"
             icon="code"
-            title="Développement full-stack"
-            text="Des API NestJS aux interfaces React et Ionic : des applications fiables, testées et déployées en continu."
+            title={t.buildTitle}
+            text={t.buildText}
             items={devStack}
             delay={0}
           />
           <DisciplineCard
-            word="Casser."
+            word={t.breakWord}
             gradientClass="text-gradient-break"
             glow="radial-gradient(circle, #ff3d5a, transparent 70%)"
             icon="shield"
-            title="Cybersécurité offensive & défensive"
-            text="Tests d’intrusion, analyse réseau et réponse à incidents : trouver la faille avant qu’un autre ne la trouve."
+            title={t.breakTitle}
+            text={t.breakText}
             items={cyberStack}
             delay={0.1}
             glitch
@@ -93,7 +96,7 @@ export default function Skills() {
 
         <Reveal className="tile mt-5 bg-silver p-8 md:p-10">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-[220px_1fr] md:items-center">
-            <p className="eyebrow text-ink">Savoir-faire</p>
+            <p className="eyebrow text-ink">{t.softTitle}</p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {softSkills.map((s) => (
                 <div key={s} className="flex items-center gap-3 text-[17px] text-ink">

@@ -1,20 +1,23 @@
-import { certifications, profile } from '../data'
+import { site } from '../data'
+import { useContent } from '../i18n'
 import { Icon, Reveal, SectionHeading } from './ui'
 
 export default function Certifications() {
+  const { certifications, ui } = useContent()
+  const t = ui.certifications
   return (
     <section id="certifications" data-nav="light" className="bg-white py-28 md:py-40">
       <div className="container-wide">
         <SectionHeading
-          eyebrow="Certifications"
+          eyebrow={t.eyebrow}
           index="05"
           title={
             <>
-              Validé.
-              <span className="text-mute"> Pas seulement appris.</span>
+              {t.title[0]}
+              <span className="text-mute">{t.title[1]}</span>
             </>
           }
-          subtitle="Des parcours pratiques sur TryHackMe, côté offensif comme défensif."
+          subtitle={t.subtitle}
         />
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -62,8 +65,8 @@ export default function Certifications() {
         </div>
 
         <Reveal className="mt-8 text-center">
-          <a href={profile.socials.tryhackme} target="_blank" rel="noreferrer" className="link-brand text-[17px]">
-            Voir mon profil TryHackMe <Icon name="chevronRight" size={16} />
+          <a href={site.socials.tryhackme} target="_blank" rel="noreferrer" className="link-brand text-[17px]">
+            {t.profile} <Icon name="chevronRight" size={16} />
           </a>
         </Reveal>
       </div>

@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react'
-import { manifesto } from '../data'
+import { useContent } from '../i18n'
 import { Label, range, useScrollScene } from './ui'
 
 /** Couleur interpolée bleu → violet → rouge pour les groupes « secure ». */
@@ -21,6 +21,7 @@ export default function Manifesto() {
   const section = useRef<HTMLElement>(null)
   const words = useRef<(HTMLSpanElement | null)[]>([])
   const label = useRef<HTMLDivElement>(null)
+  const { manifesto, ui } = useContent()
 
   const tokens = useMemo(() => {
     // [build]  *break*  {secure}
@@ -39,7 +40,8 @@ export default function Manifesto() {
       words.forEach((w, k) => out.push({ text: w, tone, pos: words.length > 1 ? k / (words.length - 1) : 0.5 }))
     })
     return out
-  }, [])
+  }, [manifesto])
+  words.current.length = tokens.length
 
   useScrollScene(section, (p) => {
     const n = tokens.length
@@ -53,11 +55,11 @@ export default function Manifesto() {
   })
 
   return (
-    <section ref={section} data-nav="dark" className="relative h-[260vh] bg-black" aria-label="Manifeste">
+    <section ref={section} data-nav="dark" className="relative h-[260vh] bg-black" aria-label={ui.manifesto.aria}>
       <div className="sticky top-0 flex h-[100svh] items-center">
         <div className="container-narrow">
           <div ref={label} className="mb-6 md:mb-8">
-            <Label dark>Ma philosophie</Label>
+            <Label dark>{ui.manifesto.label}</Label>
           </div>
           <p className="font-display text-[clamp(30px,4.6vw,64px)] font-semibold leading-[1.12] tracking-[-0.03em] text-white">
             {tokens.map((t, i) => (

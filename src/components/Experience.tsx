@@ -1,4 +1,4 @@
-import { education, experiences } from '../data'
+import { useContent } from '../i18n'
 import { Reveal, SectionHeading } from './ui'
 
 function Row({
@@ -10,6 +10,7 @@ function Row({
   bullets = [],
   stack = [],
   delay = 0,
+  currentLabel = '',
 }: {
   period: string
   current?: boolean
@@ -19,6 +20,7 @@ function Row({
   bullets?: string[]
   stack?: string[]
   delay?: number
+  currentLabel?: string
 }) {
   return (
     <Reveal delay={delay} className="grid grid-cols-1 gap-3 py-9 md:grid-cols-[240px_1fr] md:gap-10 md:py-11">
@@ -26,7 +28,7 @@ function Row({
         <p className="text-[15px] text-mute-2">{period}</p>
         {current && (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e8f2ff] px-2.5 py-0.5 text-[13px] font-medium text-build-ink md:mt-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-build-ink" /> En cours
+            <span className="h-1.5 w-1.5 rounded-full bg-build-ink" /> {currentLabel}
           </span>
         )}
       </div>
@@ -59,23 +61,25 @@ function Row({
 }
 
 export default function Experience() {
+  const { experiences, education, ui } = useContent()
+  const t = ui.experience
   return (
     <section id="parcours" data-nav="light" className="bg-silver py-28 md:py-40">
       <div className="container-wide">
         <SectionHeading
-          eyebrow="Parcours"
+          eyebrow={t.eyebrow}
           index="04"
           title={
             <>
-              De l’atelier
-              <br className="hidden sm:block" /> au Conseil de l’Europe.
+              {t.title[0]}
+              <br className="hidden sm:block" /> {t.title[1]}
             </>
           }
-          subtitle="Quatre expériences, une même ligne directrice : construire des choses utiles, et les rendre sûres."
+          subtitle={t.subtitle}
         />
 
         <Reveal>
-          <p className="eyebrow border-b border-line pb-5 text-ink">Expérience</p>
+          <p className="eyebrow border-b border-line pb-5 text-ink">{t.experience}</p>
         </Reveal>
         <div className="divide-y divide-line">
           {experiences.map((e) => (
@@ -83,6 +87,7 @@ export default function Experience() {
               key={e.role + e.org}
               period={e.period}
               current={e.current}
+              currentLabel={t.current}
               title={e.role}
               meta={`${e.org} · ${e.location} · ${e.type}`}
               description={e.description}
@@ -93,7 +98,7 @@ export default function Experience() {
         </div>
 
         <Reveal className="mt-16 md:mt-24">
-          <p className="eyebrow border-b border-line pb-5 text-ink">Formation</p>
+          <p className="eyebrow border-b border-line pb-5 text-ink">{t.education}</p>
         </Reveal>
         <div className="divide-y divide-line">
           {education.map((ed) => (

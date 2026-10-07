@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { profile, projects, type Project } from '../data'
+import { site, type Project } from '../data'
+import { useContent } from '../i18n'
 import { Icon, Label, Reveal, clamp, useMediaQuery, useScrollScene } from './ui'
 import { VISUALS } from './ProjectVisuals'
 
@@ -11,16 +12,17 @@ const TAGS = {
 }
 
 const STATUS = {
-  'open-source': { label: 'Open source', dot: 'bg-[#30d158]' },
-  wip: { label: 'En développement', dot: 'bg-break-2' },
-  pro: { label: 'Projet professionnel', dot: 'bg-[#30d158]' },
-  soon: { label: 'Démo en préparation', dot: 'bg-break-2' },
+  'open-source': { dot: 'bg-[#30d158]' },
+  wip: { dot: 'bg-break-2' },
+  pro: { dot: 'bg-[#30d158]' },
+  soon: { dot: 'bg-break-2' },
 }
 
 function ProjectCard({ p, index }: { p: Project; index: number }) {
   const Visual = VISUALS[p.visual]
   const tag = TAGS[p.tag]
   const status = STATUS[p.status]
+  const t = useContent().ui.projects
   return (
     <article className="tile-dark flex h-full flex-col border border-white/[0.06] lg:flex-row">
       <div className="relative h-[320px] shrink-0 sm:h-[380px] lg:order-2 lg:h-auto lg:flex-1">
@@ -52,21 +54,21 @@ function ProjectCard({ p, index }: { p: Project; index: number }) {
           <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 text-[15px]">
             {p.links.demo && (
               <a href={p.links.demo} target="_blank" rel="noreferrer" className="btn-primary !py-2.5 !text-[15px]">
-                Tester la démo <Icon name="arrowUpRight" size={15} />
+                {t.demo} <Icon name="arrowUpRight" size={15} />
               </a>
             )}
             {p.links.code && (
               <a href={p.links.code} target="_blank" rel="noreferrer" className="link-brand !text-build-light">
-                <Icon name="github" size={15} /> Voir le code <Icon name="chevronRight" size={14} />
+                <Icon name="github" size={15} /> {t.code} <Icon name="chevronRight" size={14} />
               </a>
             )}
             {p.links.more && (
               <a href={p.links.more} target="_blank" rel="noreferrer" className="link-brand !text-build-light">
-                En savoir plus <Icon name="chevronRight" size={14} />
+                {t.more} <Icon name="chevronRight" size={14} />
               </a>
             )}
             <span className="inline-flex items-center gap-2 text-white/55">
-              <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} /> {status.label}
+              <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} /> {t.status[p.status]}
             </span>
           </div>
         </div>
@@ -76,9 +78,10 @@ function ProjectCard({ p, index }: { p: Project; index: number }) {
 }
 
 function MoreCard() {
+  const t = useContent().ui.projects
   return (
     <a
-      href={profile.socials.github}
+      href={site.socials.github}
       target="_blank"
       rel="noreferrer"
       className="tile-dark group flex h-full flex-col items-center justify-center border border-white/[0.06] p-10 text-center transition-colors hover:bg-[#1c1c1e]"
@@ -86,10 +89,10 @@ function MoreCard() {
       <span className="grid h-16 w-16 place-items-center rounded-full bg-white/[0.08] text-white transition-transform duration-500 group-hover:scale-110">
         <Icon name="github" size={28} />
       </span>
-      <p className="mt-6 font-display text-2xl font-semibold tracking-tight text-white">Plus de code sur GitHub.</p>
-      <p className="mt-2 text-[15px] text-mute">Expérimentations, outils et projets EPITECH.</p>
+      <p className="mt-6 font-display text-2xl font-semibold tracking-tight text-white">{t.moreTitle}</p>
+      <p className="mt-2 text-[15px] text-mute">{t.moreText}</p>
       <span className="link-brand mt-5 !text-build-light">
-        Voir mon profil <Icon name="arrowUpRight" size={15} />
+        {t.moreCta} <Icon name="arrowUpRight" size={15} />
       </span>
     </a>
   )
@@ -97,6 +100,8 @@ function MoreCard() {
 
 /* ---------- Galerie horizontale épinglée (desktop) ---------- */
 function PinnedGallery() {
+  const { projects, ui } = useContent()
+  const t = ui.projects
   const section = useRef<HTMLDivElement>(null)
   const track = useRef<HTMLDivElement>(null)
   const bar = useRef<HTMLDivElement>(null)
@@ -143,14 +148,14 @@ function PinnedGallery() {
         <div className="container-wide mb-8 flex items-end justify-between gap-8 xl:mb-10">
           <div>
             <Label index="02" dark>
-              Projets
+              {t.eyebrow}
             </Label>
             <h2 className="headline-l mt-4 text-white">
-              Ce que je construis<span className="text-break">.</span>
+              {t.title}<span className="text-break">.</span>
             </h2>
           </div>
           <p className="hidden max-w-xs pb-2 text-[17px] text-mute xl:block">
-            Outils open source, missions en entreprise et une place réservée pour ma prochaine release.
+            {t.subtitle}
           </p>
         </div>
         <div
@@ -178,6 +183,8 @@ function PinnedGallery() {
 }
 
 export default function Projects() {
+  const { projects, ui } = useContent()
+  const t = ui.projects
   const pinned = useMediaQuery('(min-width: 1024px) and (min-height: 640px)')
   return (
     <section id="projets" data-nav="dark" className="on-dark relative bg-black py-24 lg:py-16">
@@ -187,17 +194,17 @@ export default function Projects() {
         <div className="container-wide">
           <Reveal>
             <Label index="02" dark>
-              Projets
+              {t.eyebrow}
             </Label>
           </Reveal>
           <Reveal delay={0.08}>
             <h2 className="headline-l mt-4 text-white">
-              Ce que je construis<span className="text-break">.</span>
+              {t.title}<span className="text-break">.</span>
             </h2>
           </Reveal>
           <Reveal delay={0.14}>
             <p className="lead mt-5 max-w-xl text-mute">
-              Outils open source, missions en entreprise et une place réservée pour ma prochaine release.
+              {t.subtitle}
             </p>
           </Reveal>
           <div className="mt-12 space-y-5">

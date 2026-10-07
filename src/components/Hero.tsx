@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { profile } from '../data'
+import { useContent } from '../i18n'
 import { Break, Build, Icon, Label, ease, lerp, range, useScrollScene } from './ui'
 
 /**
@@ -17,6 +17,8 @@ export default function Hero({ ready }: { ready: boolean }) {
   const line1 = useRef<HTMLParagraphElement>(null)
   const line2 = useRef<HTMLParagraphElement>(null)
   const fade = useRef<HTMLDivElement>(null)
+  const { profile, ui } = useContent()
+  const tx = ui.hero
   const cue = useRef<HTMLDivElement>(null)
 
   useScrollScene(section, (p) => {
@@ -76,7 +78,7 @@ export default function Hero({ ready }: { ready: boolean }) {
       ref={section}
       data-nav="dark"
       className={`relative h-[320vh] bg-black ${ready ? 'is-ready' : ''}`}
-      aria-label="Présentation"
+      aria-label={tx.aria}
     >
       <div className="sticky top-0 h-[100svh] overflow-hidden">
         {/* Photo dans sa fenêtre */}
@@ -95,7 +97,7 @@ export default function Hero({ ready }: { ready: boolean }) {
               <img
                 ref={photo}
                 src={profile.photos.heroFallback}
-                alt="Ayman Mazroui, micro en main, sur scène devant un écran géant"
+                alt={tx.photoAlt}
                 className="h-full w-full object-cover will-change-transform"
                 style={{ objectPosition: '46% 30%' }}
               />
@@ -114,14 +116,16 @@ export default function Hero({ ready }: { ready: boolean }) {
                   ref={line1}
                   className="font-display text-[clamp(34px,4.6vw,68px)] font-semibold leading-[1.05] tracking-[-0.035em] text-white opacity-0"
                 >
-                  Je <Build>construis</Build> des applications solides.
+                  {tx.line1[0]}
+                  <Build>{tx.line1[1]}</Build>
+                  {tx.line1[2]}
                 </p>
                 <p
                   ref={line2}
                   className="mt-1 font-display text-[clamp(34px,4.6vw,68px)] font-semibold leading-[1.05] tracking-[-0.035em] opacity-0"
                 >
-                  <span className="text-white">Puis j’essaie de les </span>
-                  <Break>casser.</Break>
+                  <span className="text-white">{tx.line2[0]}</span>
+                  <Break>{tx.line2[1]}</Break>
                 </p>
               </div>
             </div>
@@ -133,7 +137,8 @@ export default function Hero({ ready }: { ready: boolean }) {
           <div className="container-narrow">
             <div className="hero-enter flex justify-center" style={{ ['--d' as string]: '0s' }}>
               <Label dark>
-                Build · Break · Secure<span className="hidden sm:inline"> · Portfolio 2026</span>
+                {tx.label}
+                <span className="hidden sm:inline">{tx.labelYear}</span>
               </Label>
             </div>
             <h1
@@ -154,10 +159,10 @@ export default function Hero({ ready }: { ready: boolean }) {
               style={{ ['--d' as string]: '0.28s' }}
             >
               <button onClick={() => go('contact')} className="btn-primary">
-                Me contacter
+                {tx.contact}
               </button>
               <a href={profile.cv} download className="link-brand text-[17px] !text-build-light">
-                Télécharger le CV <Icon name="chevronRight" size={16} />
+                {tx.cv} <Icon name="chevronRight" size={16} />
               </a>
             </div>
           </div>

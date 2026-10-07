@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { useInView } from './ui'
+import { useContent } from '../i18n'
 
 /* =============================================================================
  *  Illustrations animées des cartes projets (100 % CSS / SVG, sauf le logo
@@ -76,17 +77,18 @@ export function VisualTerminal() {
 /* ---------- Latent : secteurs récupérés + timeline ---------- */
 export function VisualTimeline() {
   const [ref, inView] = useInView<HTMLDivElement>(0.25)
+  const v = useContent().ui.projects.visuals
   // 0 = vide, 1 = effacé, 2 = récupéré
   const cells = Array.from({ length: 84 }, (_, k) => {
     const v = (k * 37 + (k % 7) * 11) % 13
     return v < 4 ? 2 : v < 6 ? 1 : 0
   })
   const rows = [
-    { t: '09:41:07', id: '4624', msg: 'Ouverture de session RDP', lvl: 'L0' },
-    { t: '09:43:52', id: '4688', msg: 'powershell.exe -enc JABz…', lvl: 'L1' },
-    { t: '09:44:10', id: '7045', msg: 'Service installé : svc_upd', lvl: 'L2' },
-    { t: '09:47:31', id: '4720', msg: 'Compte créé : backup$', lvl: 'L3' },
-    { t: '09:52:03', id: '1102', msg: 'Journal d’audit effacé', lvl: 'L0', alert: true },
+    { t: '09:41:07', id: '4624', msg: v.latentRows[0], lvl: 'L0' },
+    { t: '09:43:52', id: '4688', msg: v.latentRows[1], lvl: 'L1' },
+    { t: '09:44:10', id: '7045', msg: v.latentRows[2], lvl: 'L2' },
+    { t: '09:47:31', id: '4720', msg: v.latentRows[3], lvl: 'L3' },
+    { t: '09:52:03', id: '1102', msg: v.latentRows[4], lvl: 'L0', alert: true },
   ]
   const lvlColor: Record<string, string> = {
     L0: 'bg-[#30d158]/15 text-[#5fe08a]',
@@ -102,8 +104,8 @@ export function VisualTimeline() {
       />
       <div className="relative mx-auto w-full max-w-[560px]">
         <p className="mb-2 flex items-center justify-between font-mono text-[11px] text-white/40">
-          <span>disk.E01 · espace non alloué</span>
-          <span className="text-[#8fb6ff]">1 284 records</span>
+          <span>{v.latentSource}</span>
+          <span className="text-[#8fb6ff]">{v.latentCount}</span>
         </p>
         <div className="grid grid-cols-[repeat(21,minmax(0,1fr))] gap-[3px]">
           {cells.map((c, k) => (
@@ -241,37 +243,38 @@ function Connector() {
 }
 
 export function VisualFlow() {
+  const f = useContent().ui.projects.visuals.soar
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden p-5 sm:p-8">
       <div className="dot-grid absolute inset-0 opacity-50 [mask-image:radial-gradient(circle_at_center,black,transparent_75%)]" />
       <div className="relative w-full max-w-[400px]">
         <p className="mb-3 text-center font-mono text-[11px] text-white/35">triage-phishing.yml · Cortex XSOAR</p>
         <Node n={0} tone="start" className="mx-auto w-fit rounded-full px-4">
-          ● Alerte : email suspect
+          ● {f[0]}
         </Node>
         <Connector />
-        <Node n={1}>Extraction des IOC (URL, IP, hash)</Node>
+        <Node n={1}>{f[1]}</Node>
         <Connector />
-        <Node n={2}>Enrichissement réputation</Node>
+        <Node n={2}>{f[2]}</Node>
         <Connector />
         <Node n={3} className="mx-auto w-fit">
-          Verdict : malveillant ?
+          {f[3]}
         </Node>
         <svg viewBox="0 0 200 20" className="h-5 w-full" preserveAspectRatio="none" aria-hidden="true">
           <path d="M100 0 V8 M50 8 H150 M50 8 V20 M150 8 V20" stroke="rgba(255,255,255,0.15)" fill="none" />
         </svg>
         <div className="grid grid-cols-2 gap-3">
           <Node n={4} tone="break">
-            Oui : bloquer l’IP, purger l’email
+            {f[4]}
           </Node>
           <Node n={4} tone="build">
-            Non : clôture faux positif
+            {f[5]}
           </Node>
         </div>
         <svg viewBox="0 0 200 20" className="h-5 w-full" preserveAspectRatio="none" aria-hidden="true">
           <path d="M50 0 V12 M150 0 V12 M50 12 H150 M100 12 V20" stroke="rgba(255,255,255,0.15)" fill="none" />
         </svg>
-        <Node n={5}>Notification & escalade</Node>
+        <Node n={5}>{f[6]}</Node>
       </div>
     </div>
   )
@@ -385,6 +388,7 @@ export function VisualShield() {
 
 /* ---------- Prochaine release : orbe ---------- */
 export function VisualOrb() {
+  const soon = useContent().ui.projects.visuals.soon
   return (
     <div className="relative h-full w-full overflow-hidden">
       <div className="dot-grid absolute inset-0 opacity-40 [mask-image:radial-gradient(circle_at_center,black,transparent_70%)]" />
@@ -395,7 +399,7 @@ export function VisualOrb() {
         <div className="orb absolute inset-[18%] rounded-full" />
         <div className="absolute inset-[18%] rounded-full bg-[radial-gradient(circle_at_50%_50%,transparent_40%,rgba(0,0,0,0.55)_100%)]" />
       </div>
-      <p className="shimmer label absolute inset-x-0 bottom-[9%] text-center !tracking-[0.3em]">Bientôt disponible</p>
+      <p className="shimmer label absolute inset-x-0 bottom-[9%] text-center !tracking-[0.3em]">{soon}</p>
     </div>
   )
 }

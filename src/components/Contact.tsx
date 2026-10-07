@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from 'react'
-import { profile } from '../data'
+import { useContent } from '../i18n'
 import { Icon, Label, Mark, Reveal } from './ui'
 
 export default function Contact() {
+  const { profile, ui } = useContent()
+  const t = ui.contact
   const [copied, setCopied] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', message: '' })
 
@@ -23,7 +25,7 @@ export default function Contact() {
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
-    const subject = encodeURIComponent(`Contact portfolio : ${form.name || 'Nouveau message'}`)
+    const subject = encodeURIComponent(`${t.subject} : ${form.name || t.newMessage}`)
     const body = encodeURIComponent(`${form.message}\n\n${form.name}\n${form.email}`)
     window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`
   }
@@ -49,7 +51,7 @@ export default function Contact() {
         <Reveal className="flex flex-col items-center gap-6">
           <Mark size={56} />
           <Label index="06" dark>
-            Contact
+            {t.eyebrow}
           </Label>
         </Reveal>
         <Reveal className="mt-6">
@@ -63,14 +65,14 @@ export default function Contact() {
         </Reveal>
         <Reveal delay={0.08}>
           <h2 className="headline-xl mt-8 text-white">
-            Parlons de votre
+            {t.title[0]}
             <br />
-            <span className="text-gradient">prochain projet.</span>
+            <span className="text-gradient">{t.title[1]}</span>
           </h2>
         </Reveal>
         <Reveal delay={0.16}>
           <p className="lead mx-auto mt-6 max-w-xl text-mute">
-            Alternance, stage ou collaboration : écrivez-moi, je réponds rapidement.
+            {t.subtitle}
           </p>
         </Reveal>
 
@@ -86,10 +88,10 @@ export default function Contact() {
             <button
               onClick={copy}
               className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white px-4 py-2.5 text-[15px] font-medium text-black transition-transform active:scale-95"
-              aria-label="Copier l'adresse email"
+              aria-label={t.copyAria}
             >
               <Icon name={copied ? 'check' : 'copy'} size={15} strokeWidth={2} />
-              <span className="hidden sm:inline">{copied ? 'Copié' : 'Copier'}</span>
+              <span className="hidden sm:inline">{copied ? t.copied : t.copy}</span>
             </button>
           </div>
         </Reveal>
@@ -118,16 +120,16 @@ export default function Contact() {
         {/* Formulaire */}
         <Reveal delay={0.1} className="mx-auto mt-20 max-w-2xl text-left">
           <form onSubmit={submit} className="tile-dark border border-white/[0.06] p-6 md:p-10">
-            <p className="font-display text-2xl font-semibold tracking-tight text-white">Ou laissez-moi un message.</p>
-            <p className="mt-1 text-[15px] text-mute">Votre messagerie s’ouvrira avec le message pré-rempli.</p>
+            <p className="font-display text-2xl font-semibold tracking-tight text-white">{t.formTitle}</p>
+            <p className="mt-1 text-[15px] text-mute">{t.formText}</p>
             <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label className="block">
-                <span className="sr-only">Nom</span>
+                <span className="sr-only">{t.name}</span>
                 <input
                   required
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Nom"
+                  placeholder={t.name}
                   autoComplete="name"
                   className={field}
                 />
@@ -139,7 +141,7 @@ export default function Contact() {
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="Email"
+                  placeholder={t.email}
                   autoComplete="email"
                   className={field}
                 />
@@ -152,12 +154,12 @@ export default function Contact() {
                 rows={5}
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                placeholder="Bonjour Ayman,"
+                placeholder={t.message}
                 className={`${field} resize-none`}
               />
             </label>
             <button type="submit" className="btn-primary mt-6 w-full justify-center sm:w-auto">
-              Envoyer le message <Icon name="send" size={16} />
+              {t.send} <Icon name="send" size={16} />
             </button>
           </form>
         </Reveal>
