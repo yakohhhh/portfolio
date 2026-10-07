@@ -1,141 +1,189 @@
-import { useEffect, useState } from 'react'
-import { Menu, X, Download } from 'lucide-react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { useLenis } from 'lenis/react'
+import { useEffect, useRef, useState } from 'react'
 import { navLinks, profile } from '../data'
+import { Icon, Mark } from './ui'
 
-export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
+/**
+ * Barre de navigation fine et translucide (façon apple.com).
+ * Elle passe automatiquement en clair ou en sombre selon la section
+ * qui se trouve dessous (attribut data-nav des sections).
+ */
+export default function Navbar({ visible }: { visible: boolean }) {
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
+  const [active, setActive] = useState('')
   const [open, setOpen] = useState(false)
-  const [active, setActive] = useState('accueil')
-
-  const lenis = useLenis()
+  const [scrolled, setScrolled] = useState(false)
+  const progress = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    let raf = 0
+    const update = () => {
+      raf = 0
+      setScrolled(window.scrollY > 10)
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      if (progress.current) progress.current.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`
+      const probe = 24
+      const sections = document.querySelectorAll<HTMLElement>('[data-nav]')
+      for (const s of sections) {
+        const r = s.getBoundingClientRect()
+        if (r.top <= probe && r.bottom > probe) {
+          setTheme((s.dataset.nav as 'dark' | 'light') ?? 'dark')
+          break
+        }
+      }
+      const mid = window.innerHeight * 0.4
+      let current = ''
+      for (const l of navLinks) {
+        const el = document.getElementById(l.id)
+        if (!el) continue
+        const r = el.getBoundingClientRect()
+        if (r.top <= mid && r.bottom > mid) current = l.id
+      }
+      setActive(current)
+    }
+    const request = () => {
+      if (!raf) raf = requestAnimationFrame(update)
+    }
+    update()
+    window.addEventListener('scroll', request, { passive: true })
+    window.addEventListener('resize', request)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', request)
+      window.removeEventListener('resize', request)
+    }
   }, [])
 
   useEffect(() => {
-    const sections = navLinks
-      .map((l) => document.getElementById(l.id))
-      .filter(Boolean) as HTMLElement[]
+    document.documentElement.style.overflow = open ? 'hidden' : ''
+  }, [open])
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) setActive(e.target.id)
-        })
-      },
-      { rootMargin: '-45% 0px -50% 0px' },
-    )
-    sections.forEach((s) => observer.observe(s))
-    return () => observer.disconnect()
-  }, [])
-
+  const dark = theme === 'dark' || open
   const go = (id: string) => {
     setOpen(false)
-    if (lenis) {
-      lenis.scrollTo('#' + id, { offset: -80 })
-    } else {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-    }
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
+    <>
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled
-          ? 'border-b border-mist bg-paper-50/80 backdrop-blur'
-          : 'border-b border-transparent'
+      className={`fixed inset-x-0 top-0 z-50 transition-[opacity,transform] duration-700 ease-[var(--ease-out-expo)] ${
+        visible ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-full opacity-0'
       }`}
     >
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
-        {/* wordmark */}
-        <button
-          onClick={() => go('accueil')}
-          className="flex items-center gap-2.5 text-sm font-semibold text-ink-900"
-        >
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-obsidian text-xs font-bold tracking-tight text-paper-50 shadow-tile">
-            AM
-          </span>
-          Ayman Mazroui
-        </button>
+      <div
+        className={`relative transition-colors duration-500 ${
+          open
+            ? 'bg-black'
+            : scrolled
+              ? dark
+                ? 'bg-black/70 backdrop-blur-xl backdrop-saturate-150'
+                : 'bg-[rgba(251,251,253,0.78)] backdrop-blur-xl backdrop-saturate-150'
+              : 'bg-transparent'
+        } ${scrolled && !open ? (dark ? 'shadow-[0_1px_0_rgba(255,255,255,0.06)]' : 'shadow-[0_1px_0_rgba(0,0,0,0.08)]') : ''}`}
+      >
+        <nav className="container-wide flex h-12 items-center justify-between">
+          <button
+            onClick={() => go('accueil')}
+            className={`flex items-center gap-2.5 font-display text-[16px] font-semibold tracking-[-0.03em] transition-colors ${
+              dark ? 'text-white' : 'text-ink'
+            }`}
+            aria-label="Retour en haut de page"
+          >
+            <Mark size={24} />
+            {profile.name}
+          </button>
 
-        {/* desktop links */}
-        <ul className="hidden items-center gap-8 lg:flex">
-          {navLinks.map((l) => (
-            <li key={l.id}>
+          <ul className="hidden items-center gap-8 lg:flex">
+            {navLinks.map((l) => (
+              <li key={l.id}>
+                <button
+                  onClick={() => go(l.id)}
+                  className={`text-[13px] tracking-[-0.01em] transition-colors ${
+                    active === l.id
+                      ? dark
+                        ? 'text-white'
+                        : 'text-ink'
+                      : dark
+                        ? 'text-white/65 hover:text-white'
+                        : 'text-ink/65 hover:text-ink'
+                  }`}
+                >
+                  {l.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex items-center gap-2">
+            <a
+              href={profile.cv}
+              download
+              className="hidden rounded-full bg-build-ink px-3.5 py-1 text-[13px] text-white transition-colors hover:bg-build-hover sm:inline-flex"
+            >
+              Télécharger le CV
+            </a>
+            <button
+              onClick={() => setOpen((o) => !o)}
+              className={`-mr-2 grid h-10 w-10 place-items-center lg:hidden ${dark ? 'text-white' : 'text-ink'}`}
+              aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+              aria-expanded={open}
+            >
+              <span className="relative block h-3 w-4">
+                <span
+                  className={`absolute left-0 h-[1.5px] w-4 rounded bg-current transition-all duration-300 ${
+                    open ? 'top-[5px] rotate-45' : 'top-0.5'
+                  }`}
+                />
+                <span
+                  className={`absolute left-0 h-[1.5px] w-4 rounded bg-current transition-all duration-300 ${
+                    open ? 'top-[5px] -rotate-45' : 'top-[9px]'
+                  }`}
+                />
+              </span>
+            </button>
+          </div>
+        </nav>
+        {/* progression de lecture build → break */}
+        <div ref={progress} className="scroll-progress absolute inset-x-0 bottom-0 h-[2px]" style={{ transform: 'scaleX(0)' }} />
+      </div>
+    </header>
+
+      {/* Menu mobile plein écran (hors du header pour que « fixed » couvre tout l'écran) */}
+      <div
+        className={`fixed inset-x-0 bottom-0 top-12 z-40 overflow-y-auto bg-black transition-[opacity,visibility] duration-500 lg:hidden ${
+          open ? 'visible opacity-100' : 'invisible opacity-0'
+        }`}
+        aria-hidden={!open}
+      >
+        <ul className="container-wide pt-8">
+          {navLinks.map((l, i) => (
+            <li
+              key={l.id}
+              className="transition-all duration-500 ease-[var(--ease-out-expo)]"
+              style={{
+                transitionDelay: open ? `${80 + i * 45}ms` : '0ms',
+                opacity: open ? 1 : 0,
+                transform: open ? 'none' : 'translateY(-8px)',
+              }}
+            >
               <button
                 onClick={() => go(l.id)}
-                className={`link-underline text-sm transition-colors ${
-                  active === l.id ? 'text-ink-900 border-b-2 border-accent-500' : 'text-ink-600 hover:text-ink-900'
-                }`}
+                className="block w-full py-2.5 text-left font-display text-[28px] font-semibold tracking-tight text-[#e8e8ed] hover:text-white"
               >
                 {l.label}
               </button>
             </li>
           ))}
+          <li
+            className="mt-8 transition-all duration-500"
+            style={{ transitionDelay: open ? '400ms' : '0ms', opacity: open ? 1 : 0 }}
+          >
+            <a href={profile.cv} download className="btn-primary">
+              <Icon name="download" size={16} /> Télécharger le CV
+            </a>
+          </li>
         </ul>
-
-        {/* cta + burger */}
-        <div className="flex items-center gap-3">
-          <a
-            href={profile.cv}
-            download
-            className="group hidden items-center gap-2 rounded-full bg-accent-500 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-accent-600 sm:inline-flex"
-          >
-            <Download size={15} className="transition-transform duration-300 group-hover:translate-y-0.5" />
-            CV
-          </a>
-          <button
-            onClick={() => setOpen((o) => !o)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-mist-strong text-ink-800 transition-colors hover:border-ink-900 lg:hidden"
-            aria-label="Menu"
-          >
-            {open ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
-      </nav>
-
-      {/* mobile panel */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-4 mb-3 rounded-3xl border border-mist bg-paper-100 shadow-card lg:hidden"
-          >
-            <ul className="flex flex-col gap-1 p-3">
-              {navLinks.map((l) => (
-                <li key={l.id}>
-                  <button
-                    onClick={() => go(l.id)}
-                    className={`block w-full rounded-2xl px-3 py-2.5 text-left text-sm transition-colors ${
-                      active === l.id ? 'bg-paper-200 text-ink-900' : 'text-ink-600 hover:bg-paper-50'
-                    }`}
-                  >
-                    {l.label}
-                  </button>
-                </li>
-              ))}
-              <li>
-                <a
-                  href={profile.cv}
-                  download
-                  className="mt-1 flex items-center gap-2 rounded-full bg-ink-900 px-4 py-2.5 text-sm font-medium text-paper-50 transition-colors hover:bg-ink-800"
-                >
-                  <Download size={15} /> Télécharger le CV
-                </a>
-              </li>
-            </ul>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+      </div>
+    </>
   )
 }

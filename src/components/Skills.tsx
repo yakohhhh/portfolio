@@ -1,91 +1,111 @@
-import { Code2, ShieldHalf, Check } from 'lucide-react'
-import { devStack, cyberStack, softSkills } from '../data'
-import SectionHeading from './SectionHeading'
-import { FadeUp, Stagger, StaggerItem, Kicker } from './ui'
+import { cyberStack, devStack, softSkills } from '../data'
+import { Icon, Reveal, SectionHeading } from './ui'
 
-function StackCard({
-  title,
-  subtitle,
+function DisciplineCard({
+  word,
+  gradientClass,
+  glow,
   icon,
+  title,
+  text,
   items,
+  delay,
+  glitch = false,
 }: {
+  word: string
+  gradientClass: string
+  glow: string
+  icon: string
   title: string
-  subtitle: string
-  icon: React.ReactNode
+  text: string
   items: string[]
+  delay: number
+  glitch?: boolean
 }) {
   return (
-    <div className="rounded-3xl border border-mist bg-paper-100 p-6 shadow-soft transition-transform duration-300 hover:-translate-y-1 hover:shadow-card sm:p-7">
-      <div className="flex items-center gap-3">
-        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-obsidian text-paper-50 shadow-tile">
-          {icon}
+    <Reveal delay={delay} className="tile group flex flex-col bg-silver p-8 md:p-12">
+      <div
+        className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-25 blur-3xl transition-opacity duration-700 group-hover:opacity-45"
+        style={{ background: glow }}
+      />
+      <div className="relative flex items-center justify-between">
+        <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white text-ink shadow-sm">
+          <Icon name={icon} size={22} />
         </span>
-        <div>
-          <h3 className="text-2xl font-semibold tracking-tight text-ink-900">{title}</h3>
-          <p className="text-sm text-ink-500">{subtitle}</p>
-        </div>
       </div>
-
-      <Stagger className="mt-6 flex flex-wrap gap-2">
+      <p className="relative mt-10 font-display text-[clamp(56px,7vw,96px)] font-semibold leading-none tracking-[-0.06em]">
+        <span className={`${gradientClass} ${glitch ? 'glitch' : ''}`} data-text={word}>
+          {word}
+        </span>
+      </p>
+      <h3 className="relative mt-5 text-[clamp(22px,2vw,28px)] leading-tight text-ink">{title}</h3>
+      <p className="relative mt-3 max-w-md text-[17px] leading-relaxed text-mute-2">{text}</p>
+      <div className="relative mt-8 flex flex-wrap gap-2">
         {items.map((it) => (
-          <StaggerItem key={it}>
-            <span className="rounded-full border border-mist-strong px-3 py-1 text-xs text-ink-600">
-              {it}
-            </span>
-          </StaggerItem>
+          <span key={it} className="chip bg-white text-ink">
+            {it}
+          </span>
         ))}
-      </Stagger>
-    </div>
+      </div>
+    </Reveal>
   )
 }
 
 export default function Skills() {
   return (
-    <section id="competences" className="scroll-mt-24 py-24 sm:py-28">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+    <section id="competences" data-nav="light" className="bg-white py-28 md:py-40">
+      <div className="container-wide">
         <SectionHeading
-          label="Compétences"
-          title="Compétences & outils"
-          subtitle="Deux domaines complémentaires : concevoir des applications fiables et savoir les éprouver."
+          eyebrow="Compétences"
+          index="03"
+          title={
+            <>
+              Deux disciplines.
+              <br />
+              <span className="text-mute">Un même niveau d’exigence.</span>
+            </>
+          }
         />
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <FadeUp>
-            <StackCard
-              title="Développement"
-              subtitle="Conception & intégration"
-              icon={<Code2 size={20} />}
-              items={devStack}
-            />
-          </FadeUp>
-          <FadeUp delay={0.08}>
-            <StackCard
-              title="Cybersécurité"
-              subtitle="Tests d'intrusion & défense"
-              icon={<ShieldHalf size={20} />}
-              items={cyberStack}
-            />
-          </FadeUp>
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <DisciplineCard
+            word="Construire."
+            gradientClass="text-gradient-build"
+            glow="radial-gradient(circle, #2f7bff, transparent 70%)"
+            icon="code"
+            title="Développement full-stack"
+            text="Des API NestJS aux interfaces React et Ionic : des applications fiables, testées et déployées en continu."
+            items={devStack}
+            delay={0}
+          />
+          <DisciplineCard
+            word="Casser."
+            gradientClass="text-gradient-break"
+            glow="radial-gradient(circle, #ff3d5a, transparent 70%)"
+            icon="shield"
+            title="Cybersécurité offensive & défensive"
+            text="Tests d’intrusion, analyse réseau et réponse à incidents : trouver la faille avant qu’un autre ne la trouve."
+            items={cyberStack}
+            delay={0.1}
+            glitch
+          />
         </div>
 
-        {/* soft skills */}
-        <FadeUp delay={0.04}>
-          <div className="mt-6 rounded-3xl border border-mist bg-paper-100 p-6 shadow-soft sm:p-7">
-            <div className="mb-4">
-              <Kicker>Savoir-faire</Kicker>
-            </div>
-            <Stagger className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Reveal className="tile mt-5 bg-silver p-8 md:p-10">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-[220px_1fr] md:items-center">
+            <p className="eyebrow text-ink">Savoir-faire</p>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {softSkills.map((s) => (
-                <StaggerItem key={s}>
-                  <div className="flex items-center gap-2.5 text-sm text-ink-700">
-                    <Check size={15} className="shrink-0 text-ink-900" />
-                    {s}
-                  </div>
-                </StaggerItem>
+                <div key={s} className="flex items-center gap-3 text-[17px] text-ink">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white text-build-ink">
+                    <Icon name="check" size={15} strokeWidth={2.4} />
+                  </span>
+                  {s}
+                </div>
               ))}
-            </Stagger>
+            </div>
           </div>
-        </FadeUp>
+        </Reveal>
       </div>
     </section>
   )

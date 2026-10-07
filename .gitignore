@@ -15,3 +15,7 @@ dist-ssr
 # logs
 npm-debug.log*
 yarn-error.log*
+# fichiers de travail
+Claude outputs/
+Ayman.JPG
+ayman.JPG

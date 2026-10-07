@@ -1,112 +1,110 @@
-import { Briefcase, GraduationCap } from 'lucide-react'
-import { experiences, education } from '../data'
-import SectionHeading from './SectionHeading'
-import { Stagger, StaggerItem, Kicker } from './ui'
+import { education, experiences } from '../data'
+import { Reveal, SectionHeading } from './ui'
 
-const subLabel =
-  'mb-8 flex items-center gap-2.5 font-mono text-xs font-medium uppercase tracking-[0.18em] text-ink-500'
-
-function TimelineExperience() {
+function Row({
+  period,
+  current,
+  title,
+  meta,
+  description,
+  bullets = [],
+  stack = [],
+  delay = 0,
+}: {
+  period: string
+  current?: boolean
+  title: string
+  meta: string
+  description: string
+  bullets?: string[]
+  stack?: string[]
+  delay?: number
+}) {
   return (
-    <div>
-      <div className={subLabel}>
-        <Briefcase size={15} className="text-ink-700" />
-        <Kicker>Expérience</Kicker>
+    <Reveal delay={delay} className="grid grid-cols-1 gap-3 py-9 md:grid-cols-[240px_1fr] md:gap-10 md:py-11">
+      <div className="flex items-center gap-3 md:block">
+        <p className="text-[15px] text-mute-2">{period}</p>
+        {current && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e8f2ff] px-2.5 py-0.5 text-[13px] font-medium text-build-ink md:mt-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-build-ink" /> En cours
+          </span>
+        )}
       </div>
-      <Stagger className="relative space-y-8 border-l border-mist pl-7">
-        {experiences.map((exp, i) => (
-          <StaggerItem key={i}>
-            <div className="relative">
-              {exp.current ? (
-                <span className="absolute -left-[35px] top-1.5 h-3 w-3 rounded-full bg-accent-500 ring-4 ring-paper-50" />
-              ) : (
-                <span className="absolute -left-[33px] top-2 h-2.5 w-2.5 rounded-full bg-ink-300" />
-              )}
-
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <span className="font-mono text-xs text-ink-500">{exp.period}</span>
-                {exp.current && (
-                  <span className="rounded-full border border-accent-200 px-2.5 py-0.5 text-xs text-accent-600">
-                    En cours
-                  </span>
-                )}
-              </div>
-
-              <h4 className="mt-2 text-xl font-semibold tracking-tight text-ink-900">{exp.role}</h4>
-              <p className="text-sm text-ink-600">
-                {exp.org} · {exp.location}
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-ink-600">{exp.description}</p>
-
-              {exp.bullets.length > 0 && (
-                <ul className="mt-3 space-y-1.5">
-                  {exp.bullets.map((b, j) => (
-                    <li key={j} className="flex gap-2.5 text-sm text-ink-600">
-                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-ink-400" />
-                      <span>{b}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-              {exp.stack.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {exp.stack.map((s) => (
-                    <span
-                      key={s}
-                      className="rounded-full border border-mist-strong px-3 py-1 text-xs text-ink-600"
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </StaggerItem>
-        ))}
-      </Stagger>
-    </div>
-  )
-}
-
-function TimelineEducation() {
-  return (
-    <div>
-      <div className={subLabel}>
-        <GraduationCap size={15} className="text-ink-700" />
-        <Kicker>Formation</Kicker>
+      <div>
+        <h3 className="text-[clamp(22px,2.2vw,28px)] leading-tight text-ink">{title}</h3>
+        <p className="mt-1 text-[17px] text-mute-2">{meta}</p>
+        <p className="mt-4 max-w-2xl text-[17px] leading-relaxed text-ink/80">{description}</p>
+        {bullets.length > 0 && (
+          <ul className="mt-4 max-w-2xl space-y-2">
+            {bullets.map((b) => (
+              <li key={b} className="flex gap-3 text-[16px] leading-relaxed text-mute-2">
+                <span className="mt-[11px] h-1 w-1 shrink-0 rounded-full bg-mute" />
+                {b}
+              </li>
+            ))}
+          </ul>
+        )}
+        {stack.length > 0 && (
+          <div className="mt-5 flex flex-wrap gap-2">
+            {stack.map((s) => (
+              <span key={s} className="chip bg-white !text-[13px] text-ink">
+                {s}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
-      <Stagger className="relative space-y-8 border-l border-mist pl-7">
-        {education.map((ed, i) => (
-          <StaggerItem key={i}>
-            <div className="relative">
-              <span className="absolute -left-[33px] top-2 h-2.5 w-2.5 rounded-full bg-ink-300" />
-              <span className="font-mono text-xs text-ink-500">{ed.period}</span>
-              <h4 className="mt-2 text-xl font-semibold tracking-tight text-ink-900">{ed.degree}</h4>
-              <p className="text-sm text-ink-600">
-                {ed.school} · {ed.location}
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-ink-600">{ed.description}</p>
-            </div>
-          </StaggerItem>
-        ))}
-      </Stagger>
-    </div>
+    </Reveal>
   )
 }
 
 export default function Experience() {
   return (
-    <section id="parcours" className="scroll-mt-24 py-24 sm:py-28">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+    <section id="parcours" data-nav="light" className="bg-silver py-28 md:py-40">
+      <div className="container-wide">
         <SectionHeading
-          label="Parcours"
-          title="Expérience & formation"
-          subtitle="De l'atelier de contrôle technique au Conseil de l'Europe, en passant par EPITECH."
+          eyebrow="Parcours"
+          index="04"
+          title={
+            <>
+              De l’atelier
+              <br className="hidden sm:block" /> au Conseil de l’Europe.
+            </>
+          }
+          subtitle="Quatre expériences, une même ligne directrice : construire des choses utiles, et les rendre sûres."
         />
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
-          <TimelineExperience />
-          <TimelineEducation />
+
+        <Reveal>
+          <p className="eyebrow border-b border-line pb-5 text-ink">Expérience</p>
+        </Reveal>
+        <div className="divide-y divide-line">
+          {experiences.map((e) => (
+            <Row
+              key={e.role + e.org}
+              period={e.period}
+              current={e.current}
+              title={e.role}
+              meta={`${e.org} · ${e.location} · ${e.type}`}
+              description={e.description}
+              bullets={e.bullets}
+              stack={e.stack}
+            />
+          ))}
+        </div>
+
+        <Reveal className="mt-16 md:mt-24">
+          <p className="eyebrow border-b border-line pb-5 text-ink">Formation</p>
+        </Reveal>
+        <div className="divide-y divide-line">
+          {education.map((ed) => (
+            <Row
+              key={ed.degree}
+              period={ed.period}
+              title={ed.degree}
+              meta={`${ed.school} · ${ed.location}`}
+              description={ed.description}
+            />
+          ))}
         </div>
       </div>
     </section>

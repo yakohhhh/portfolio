@@ -1,120 +1,138 @@
-import { motion } from 'framer-motion'
-import { GraduationCap, MapPin, Mail } from 'lucide-react'
-import { profile, stats, languages, interests } from '../data'
-import SectionHeading from './SectionHeading'
-import { FadeUp, Stagger, StaggerItem, Kicker } from './ui'
+import { interests, languages, profile, stats } from '../data'
+import { Break, Counter, Icon, Reveal, SectionHeading, useInView } from './ui'
 
-function LanguageBar({ name, level, percent, delay }: { name: string; level: string; percent: number; delay: number }) {
+function Languages() {
+  const [ref, inView] = useInView<HTMLDivElement>(0.3)
   return (
-    <div>
-      <div className="mb-1.5 flex items-baseline justify-between">
-        <span className="text-sm font-medium text-ink-800">{name}</span>
-        <span className="text-xs text-ink-400">{level}</span>
-      </div>
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-paper-200">
-        <motion.div
-          className="h-full rounded-full bg-ink-900"
-          initial={{ width: 0 }}
-          whileInView={{ width: `${percent}%` }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9, delay, ease: 'easeOut' }}
-        />
-      </div>
+    <div ref={ref} className={`mt-6 space-y-5 ${inView ? 'is-in' : ''}`}>
+      {languages.map((l, i) => (
+        <div key={l.name}>
+          <div className="mb-2 flex items-baseline justify-between text-[15px]">
+            <span className="font-medium text-ink">{l.name}</span>
+            <span className="text-mute">{l.level}</span>
+          </div>
+          <div className="h-[5px] overflow-hidden rounded-full bg-silver">
+            <div
+              className="bar-fill h-full rounded-full"
+              style={{
+                background: 'linear-gradient(90deg, var(--color-build), var(--color-secure), var(--color-break))',
+                backgroundSize: `${(100 / l.percent) * 100}% 100%`,
+                ['--v' as string]: l.percent / 100,
+                ['--d' as string]: `${0.1 + i * 0.1}s`,
+              }}
+            />
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
 
 export default function About() {
   return (
-    <section id="a-propos" className="scroll-mt-24 py-24 sm:py-28">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+    <section id="a-propos" data-nav="light" className="bg-silver py-28 md:py-40">
+      <div className="container-wide">
         <SectionHeading
-          label="À propos"
-          title="Profil"
-          subtitle="Développeur full-stack orienté qualité et sécurité, en formation d'ingénierie logicielle à EPITECH."
+          eyebrow="À propos"
+          index="01"
+          title={
+            <>
+              Un développeur qui pense comme un <Break>attaquant.</Break>
+            </>
+          }
         />
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[320px_1fr]">
-          {/* profile card */}
-          <FadeUp>
-            <div className="rounded-3xl border border-mist bg-paper-100 p-6 shadow-soft transition-transform duration-300 hover:-translate-y-1 hover:shadow-card">
-              <div className="flex items-center gap-4">
-                <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-obsidian text-2xl font-semibold text-paper-50 shadow-tile">
-                  {profile.initials}
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold tracking-tight text-ink-900">{profile.name}</h3>
-                  <p className="text-sm text-ink-500">DevSecOps &amp; Cybersécurité</p>
-                </div>
-              </div>
-
-              <div className="mt-6 space-y-3 border-t border-mist pt-5 text-sm">
-                <div className="flex items-center gap-3 text-ink-600">
-                  <GraduationCap size={16} className="shrink-0 text-ink-400" />
-                  <span>EPITECH, 3ᵉ année</span>
-                </div>
-                <div className="flex items-center gap-3 text-ink-600">
-                  <MapPin size={16} className="shrink-0 text-ink-400" />
-                  <span>{profile.location}</span>
-                </div>
-                <a
-                  href={`mailto:${profile.email}`}
-                  className="group flex items-center gap-3 text-ink-600 transition-colors hover:text-ink-900"
-                >
-                  <Mail size={16} className="shrink-0 text-ink-400 transition-colors group-hover:text-ink-900" />
-                  <span className="link-underline truncate">{profile.email}</span>
-                </a>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-6 md:gap-5 lg:grid-cols-12">
+          {/* Portrait */}
+          <Reveal variant="scale" className="tile min-h-[460px] md:col-span-3 md:row-span-2 lg:col-span-5">
+            <picture>
+              <source type="image/webp" srcSet={profile.photos.portrait} />
+              <img
+                src={profile.photos.portraitFallback}
+                alt="Portrait d'Ayman Mazroui"
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ objectPosition: '50% 22%' }}
+              />
+            </picture>
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent p-7 pt-24">
+              <p className="font-display text-2xl font-semibold tracking-tight text-white">{profile.name}</p>
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[15px] text-white/75">
+                <span className="inline-flex items-center gap-1.5">
+                  <Icon name="mapPin" size={15} /> {profile.location}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Icon name="graduation" size={15} /> EPITECH, 4ᵉ année
+                </span>
               </div>
             </div>
-          </FadeUp>
+          </Reveal>
 
-          {/* right column */}
-          <div className="space-y-10">
-            <div className="space-y-4">
+          {/* Bio */}
+          <Reveal delay={0.08} className="tile p-8 md:col-span-3 md:p-10 lg:col-span-7">
+            <p className="font-display text-[clamp(22px,2vw,28px)] font-semibold leading-snug tracking-tight text-ink">
+              {profile.tagline}
+            </p>
+            <div className="mt-6 space-y-4 text-[17px] leading-relaxed text-mute-2">
               {profile.bio.map((p, i) => (
-                <FadeUp key={i} delay={i * 0.12}>
-                  <p className="text-base leading-relaxed text-ink-600">{p}</p>
-                </FadeUp>
+                <p key={i}>{p}</p>
               ))}
             </div>
+          </Reveal>
 
-            {/* stats */}
-            <Stagger className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-mist bg-mist shadow-soft sm:grid-cols-4">
-              {stats.map((s) => (
-                <StaggerItem key={s.label} className="bg-paper-100 p-5 text-center">
-                  <div className="text-3xl font-semibold tracking-tight text-ink-900">{s.value}</div>
-                  <div className="mt-1.5 text-xs font-medium text-ink-500">{s.label}</div>
-                  <div className="mt-0.5 text-[11px] text-ink-400">{s.hint}</div>
-                </StaggerItem>
-              ))}
-            </Stagger>
-
-            {/* languages */}
-            <FadeUp>
-              <Kicker>Langues</Kicker>
-              <div className="mt-4 grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
-                {languages.map((l, i) => (
-                  <LanguageBar key={l.name} {...l} delay={i * 0.08} />
-                ))}
-              </div>
-            </FadeUp>
-
-            {/* interests */}
-            <div>
-              <FadeUp>
-                <Kicker>Centres d'intérêt</Kicker>
-              </FadeUp>
-              <Stagger className="mt-3 flex flex-wrap gap-2">
-                {interests.map((it) => (
-                  <StaggerItem key={it}>
-                    <span className="inline-flex rounded-full border border-mist-strong px-3 py-1.5 text-xs text-ink-600 transition-colors hover:border-ink-900">
-                      {it}
-                    </span>
-                  </StaggerItem>
-                ))}
-              </Stagger>
-            </div>
+          {/* Chiffres */}
+          <div className="grid grid-cols-2 gap-4 md:col-span-3 md:gap-5 lg:col-span-7 lg:grid-cols-4">
+            {stats.map((s, i) => (
+              <Reveal key={s.label} delay={0.06 * i} className="tile flex flex-col justify-between p-6">
+                <p className="font-display text-[clamp(36px,3.3vw,48px)] font-semibold leading-none tracking-[-0.04em] text-ink">
+                  <Counter value={s.value} suffix={s.suffix} />
+                </p>
+                <div className="mt-6">
+                  <p className="text-[15px] font-medium text-ink">{s.label}</p>
+                  <p className="text-[13px] text-mute">{s.hint}</p>
+                </div>
+              </Reveal>
+            ))}
           </div>
+
+          {/* Langues */}
+          <Reveal className="tile p-8 md:col-span-3 lg:col-span-5">
+            <p className="eyebrow text-ink">Langues</p>
+            <Languages />
+          </Reveal>
+
+          {/* Centres d'intérêt */}
+          <Reveal delay={0.08} className="tile p-8 md:col-span-3 lg:col-span-4">
+            <p className="eyebrow text-ink">Centres d’intérêt</p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {interests.map((it) => (
+                <span key={it} className="chip bg-silver text-ink">
+                  {it}
+                </span>
+              ))}
+            </div>
+          </Reveal>
+
+          {/* Disponibilité */}
+          <Reveal delay={0.16} className="tile-dark flex flex-col justify-between p-8 md:col-span-6 lg:col-span-3">
+            <div
+              className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full opacity-60 blur-3xl"
+              style={{ background: 'radial-gradient(circle, #2f7bff, transparent 70%)' }}
+            />
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="ping absolute inline-flex h-full w-full rounded-full bg-[#30d158] opacity-70" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#30d158]" />
+            </span>
+            <div className="relative mt-8">
+              <p className="font-display text-2xl font-semibold leading-tight tracking-tight text-white">
+                Disponible.
+              </p>
+              <p className="mt-2 text-[15px] leading-snug text-mute">Alternance & stage, dès maintenant.</p>
+              <a href="#contact" className="link-brand mt-4 !text-build-light">
+                Discutons-en <Icon name="chevronRight" size={15} />
+              </a>
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>
