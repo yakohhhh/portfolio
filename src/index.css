@@ -116,6 +116,23 @@
   }
 }
 
+/* Contenu pré-rendu (remplacé par React au chargement) */
+.prerender {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  background: #000;
+  color: #8a8a93;
+  text-align: center;
+  font-size: 15px;
+}
+.prerender h1 { color: #fff; font-size: 40px; }
+.prerender a { color: #6ea2ff; }
+
 /* ============================================================
    Composants
    ============================================================ */

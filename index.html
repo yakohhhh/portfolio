@@ -30,13 +30,70 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://aymanmazroui.dev/images/og.jpg" />
     <link rel="canonical" href="https://aymanmazroui.dev/" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Données structurées : aident Google à relier le nom « Ayman Mazroui » à ce site -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://aymanmazroui.dev/#person",
+            "name": "Ayman Mazroui",
+            "alternateName": ["Ayman MAZROUI", "yakohhhh"],
+            "url": "https://aymanmazroui.dev/",
+            "image": "https://aymanmazroui.dev/images/ayman-portrait.jpg",
+            "jobTitle": "Développeur DevSecOps & étudiant en cybersécurité",
+            "email": "mailto:aymanmazroui@proton.me",
+            "address": { "@type": "PostalAddress", "addressLocality": "Strasbourg", "addressCountry": "FR" },
+            "affiliation": { "@type": "CollegeOrUniversity", "name": "EPITECH Strasbourg" },
+            "knowsAbout": ["DevSecOps", "Cybersécurité", "Tests d'intrusion", "Réponse à incidents", "NestJS", "React", "Docker", "SOAR", "Forensique"],
+            "knowsLanguage": ["fr", "ar", "en", "de"],
+            "sameAs": [
+              "https://www.linkedin.com/in/ayman-mazroui-1b13ab2b6/",
+              "https://github.com/yakohhhh",
+              "https://tryhackme.com/p/aymanepitech"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://aymanmazroui.dev/#website",
+            "url": "https://aymanmazroui.dev/",
+            "name": "Ayman Mazroui",
+            "inLanguage": "fr-FR",
+            "author": { "@id": "https://aymanmazroui.dev/#person" }
+          },
+          {
+            "@type": "ProfilePage",
+            "@id": "https://aymanmazroui.dev/#profile",
+            "url": "https://aymanmazroui.dev/",
+            "name": "Ayman Mazroui · Développeur DevSecOps & Cybersécurité",
+            "mainEntity": { "@id": "https://aymanmazroui.dev/#person" },
+            "isPartOf": { "@id": "https://aymanmazroui.dev/#website" }
+          }
+        ]
+      }
+    </script>
 
     <link rel="preload" as="image" href="/images/ayman-hero.webp" type="image/webp" />
     <link rel="preload" href="/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/GeistMono-Variable.woff2" as="font" type="font/woff2" crossorigin />
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Contenu lisible avant le chargement de React (moteurs de recherche, aperçus) -->
+    <div id="root">
+      <main class="prerender">
+        <h1>Ayman Mazroui</h1>
+        <p>Développeur DevSecOps et étudiant en cybersécurité à EPITECH Strasbourg. Je construis des applications solides, puis j'essaie de les casser.</p>
+        <p>Projets : Portcullis, Latent, playbooks SOAR, investigation avec SOF-ELK.</p>
+        <nav>
+          <a href="https://github.com/yakohhhh">GitHub</a> ·
+          <a href="https://www.linkedin.com/in/ayman-mazroui-1b13ab2b6/">LinkedIn</a> ·
+          <a href="mailto:aymanmazroui@proton.me">aymanmazroui@proton.me</a>
+        </nav>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
