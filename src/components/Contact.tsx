@@ -205,11 +205,13 @@ export default function Contact() {
               </div>
               <label className="mt-3 block">
                 <span className="sr-only">Message</span>
+                {/* Non contrôlé exprès : avec value={…}, React recopie la saisie dans le textContent
+                    du textarea, que la mesure d'audience (Globatics) lit sur les rage clicks.
+                    L'état reste à jour via onChange ; le formulaire est démonté après envoi. */}
                 <textarea
                   required
                   rows={5}
                   maxLength={5000}
-                  value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                   placeholder={t.message}
                   className={`${field} resize-none`}
